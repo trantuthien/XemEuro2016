@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Tổng Hợp Euro 2016</string>
+    <string name="again">Thử Lại</string>
+    <string name="againexit">Nhấn Back lần nữa để Thoát</string>
+    <string name="lost_internet">Mất Kết Nối Internet</string>
+    <string name="update">Chúng tôi đang cập nhật</string>
+    <string name="wrong">Lỗi Kết nối, xin thử lại</string>
+</resources>

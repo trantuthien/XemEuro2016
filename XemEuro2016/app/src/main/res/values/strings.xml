@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Highlight Euro 2016</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="error_player" translatable="false">There was an error initializing the YouTubePlayer (%1$s)</string>
+    <string name="lost_internet">Lost Internet</string>
+    <string name="again">Again</string>
+    <string name="wrong">Something Wrong, try again</string>
+    <string name="againexit">Press Back again to Exit </string>
+    <string name="update">We are updating</string>
+</resources>

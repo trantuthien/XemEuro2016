@@ -1,0 +1,31 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+    <!--<style name="AppTheme" parent="Theme.AppCompat.Light">-->
+        <!--<item name="colorPrimary">#FF6961</item>-->
+        <!--<item name="colorPrimaryDark">#C23B22</item>-->
+        <!--<item name="android:windowActionBarOverlay">true</item>-->
+        <!--<item name="windowNoTitle">true</item>-->
+        <!--<item name="windowActionBar">false</item>-->
+        <!--<item name="windowActionModeOverlay">true</item>-->
+        <!--<item name="colorAccent">#8b1818</item>-->
+        <!--&lt;!&ndash;<item name="actionMenuTextColor">@color/white</item>&ndash;&gt;-->
+        <!--&lt;!&ndash;<item name="android:textColorSecondary">@color/white</item>&ndash;&gt;-->
+        <!--&lt;!&ndash;<item name="android:actionMenuTextColor">@color/white</item>&ndash;&gt;-->
+        <!--<item name="android:windowNoTitle">true</item>-->
+        <!--&lt;!&ndash;<item name="android:windowBackground">@color/thientt_bg_list</item>&ndash;&gt;-->
+    <!--</style>-->
+    <style name="FlashScreen" parent="AppTheme">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowActionModeOverlay">true</item>
+    </style>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+</resources>
