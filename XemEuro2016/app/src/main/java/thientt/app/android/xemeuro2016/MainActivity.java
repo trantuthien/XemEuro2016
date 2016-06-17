@@ -418,11 +418,11 @@ public class MainActivity extends AppCompatActivity implements YouTubePlayer.OnF
                     @Override
                     public void onItemClick(View view, int position_item) {
                        // TLog.d(null, "nhan vao: " + position + "-" + position_item);
-                        if (data.get(position).getMode() == ServerLink.TYPE_YOUTUBE) {
+                        //if (data.get(position).getMode() == ServerLink.TYPE_YOUTUBE) {
                             openYoutubeLink(data.get(position).getMatches().get(position_item));
-                        } else {
-                            Toast.makeText(MainActivity.this, getString(R.string.update), Toast.LENGTH_SHORT).show();
-                        }
+//                        } else {
+//                            Toast.makeText(MainActivity.this, getString(R.string.update), Toast.LENGTH_SHORT).show();
+//                        }
                     }
                 });
             }
