@@ -6,23 +6,28 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewPropertyAnimator;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
+import com.devbrackets.android.exomedia.listener.OnPreparedListener;
+import com.devbrackets.android.exomedia.ui.widget.EMVideoView;
 import com.google.android.youtube.player.YouTubeApiServiceUtil;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
@@ -39,7 +44,6 @@ import thientt.app.android.xemeuro2016.pojo.Constant;
 import thientt.app.android.xemeuro2016.pojo.DeveloperKey;
 import thientt.app.android.xemeuro2016.pojo.Match;
 import thientt.app.android.xemeuro2016.pojo.ServerLink;
-import thientt.app.android.xemeuro2016.pojo.TLog;
 import thientt.app.android.xemeuro2016.pojo.ThienTTCardView;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
@@ -53,8 +57,8 @@ public class MainActivity extends AppCompatActivity implements YouTubePlayer.OnF
     private static final int LANDSCAPE_VIDEO_PADDING_DP = 5;
 
     private View videoBox;
-    private View closeButton;
-
+    // private View closeButton;
+    private int video_type = Constant.VIDEO_YOUTUBE;
 
     //ThienTT
     private ThienTTApplication application;
@@ -64,6 +68,10 @@ public class MainActivity extends AppCompatActivity implements YouTubePlayer.OnF
     private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerAdapter adapter;
     private boolean is_refesh = true;
+
+    //video suface
+//    String vidAddress = "https://0ea459f2afc21d3026c195bf3fdb19009b52f0f0.googledrive.com/host/0BwuhJt21JIePZWtpX3VtTC1nLVU";
+
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
@@ -112,20 +120,60 @@ public class MainActivity extends AppCompatActivity implements YouTubePlayer.OnF
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefreshLayout);
 
-//        createToolbar();
         showDataOnRecyclerView();
 
-       // TLog.d(this, new Gson().toJson(serverLinks));
         videoFragment =
                 (VideoFragment) getFragmentManager().findFragmentById(R.id.video_fragment_container);
         videoBox = findViewById(R.id.video_box);
-        closeButton = findViewById(R.id.close_button);
+        // closeButton = findViewById(R.id.close_button);
         videoBox.setVisibility(View.INVISIBLE);
+
+//        video_type = Constant.VIDEO_GOOGLE_DRIVER;
+
+        iniVideo();
+
         layout();
         checkYouTubeApi();
-        if (serverLinks != null && serverLinks.size() > 0)
-            openYoutubeLink(serverLinks.get(0).getMatches().get(0));
+//        if (serverLinks != null && serverLinks.size() > 0)
+//            openYoutubeLink(serverLinks.get(0).getMatches().get(0));
+
+
     }
+
+    EMVideoView emVideoView;
+
+    private void iniVideo() {
+        emVideoView = (EMVideoView) findViewById(R.id.video_view);
+        emVideoView.setOnPreparedListener(new OnPreparedListener() {
+            @Override
+            public void onPrepared() {
+                //nothing to do
+            }
+        });
+        //emVideoView.setVideoURI(Uri.parse("https://0ea459f2afc21d3026c195bf3fdb19009b52f0f0.googledrive.com/host/0BwuhJt21JIePZWtpX3VtTC1nLVU"));
+    }
+
+
+//    private void setVideoSize() {
+//
+//        int videoWidth = mediaPlayer.getVideoWidth();
+//        int videoHeight = mediaPlayer.getVideoHeight();
+//        float videoProportion = (float) videoWidth / (float) videoHeight;
+//
+//        int screenWidth = getWindowManager().getDefaultDisplay().getWidth();
+//        int screenHeight = getWindowManager().getDefaultDisplay().getHeight();
+//        float screenProportion = (float) screenWidth / (float) screenHeight;
+//
+//        android.view.ViewGroup.LayoutParams lp = vidSurface.getLayoutParams();
+//        if (videoProportion > screenProportion) {
+//            lp.width = screenWidth;
+//            lp.height = (int) ((float) screenWidth / videoProportion);
+//        } else {
+//            lp.width = (int) (videoProportion * (float) screenHeight);
+//            lp.height = screenHeight;
+//        }
+//        vidSurface.setLayoutParams(lp);
+//    }
 
     private void showDataOnRecyclerView() {
         serverLinks = application.getServerLinks();
@@ -143,11 +191,6 @@ public class MainActivity extends AppCompatActivity implements YouTubePlayer.OnF
             recyclerView.setHasFixedSize(true);
             swipeRefreshLayout.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE);
             swipeRefreshLayout.setOnRefreshListener(MainActivity.this);
-        } else {
-            serverLinks = application.getServerLinks();
-            adapter = new RecyclerAdapter(serverLinks);
-            recyclerView.setAdapter(adapter);
-            openYoutubeLink(serverLinks.get(0).getMatches().get(0));
         }
     }
 
@@ -161,12 +204,23 @@ public class MainActivity extends AppCompatActivity implements YouTubePlayer.OnF
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        if (video_type == Constant.VIDEO_GOOGLE_DRIVER) {
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                getSupportActionBar().hide();
+                getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            } else {
+                getSupportActionBar().show();
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            }
+        }
         layout();
     }
 
     public void onClickClose(@SuppressWarnings("unused") View view) {
 
         videoFragment.pause();
+        emVideoView.pause();
+        item_close.setVisible(false);
         ViewPropertyAnimator animator = videoBox.animate()
                 .translationYBy(videoBox.getHeight())
                 .setDuration(ANIMATION_DURATION_MILLIS);
@@ -204,24 +258,35 @@ public class MainActivity extends AppCompatActivity implements YouTubePlayer.OnF
         }
     }
 
-    private void openYoutubeLink(Match match) {
-        VideoFragment videoFragment =
-                (VideoFragment) getFragmentManager().findFragmentById(R.id.video_fragment_container);
-        videoFragment.setVideoId(match.getLink());
 
-        // The videoBox is INVISIBLE if no video was previously selected, so we need to show it now.
+    private void openYoutubeLink(Match match) {
+        video_type = checkTypeOfVideo(match.getLink());
+        if (video_type == Constant.VIDEO_YOUTUBE) {
+            VideoFragment videoFragment =
+                    (VideoFragment) getFragmentManager().findFragmentById(R.id.video_fragment_container);
+            videoFragment.setVideoId(match.getLink());
+        } else {
+            emVideoView.setVideoURI(Uri.parse(match.getLink()));
+        }
+        item_close.setVisible(true);
+
         if (videoBox.getVisibility() != View.VISIBLE) {
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                // Initially translate off the screen so that it can be animated in from below.
                 videoBox.setTranslationY(videoBox.getHeight());
             }
             videoBox.setVisibility(View.VISIBLE);
         }
 
-        // If the fragment is off the screen, we animate it in.
         if (videoBox.getTranslationY() > 0) {
             videoBox.animate().translationY(0).setDuration(ANIMATION_DURATION_MILLIS);
         }
+        layout();
+    }
+
+    private int checkTypeOfVideo(String link) {
+        if (link != null && (link.contains("http://")|| link.contains("https://")))
+            return Constant.VIDEO_GOOGLE_DRIVER;
+        return Constant.VIDEO_YOUTUBE;
     }
 
     @Override
@@ -234,27 +299,27 @@ public class MainActivity extends AppCompatActivity implements YouTubePlayer.OnF
         boolean isPortrait =
                 getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
 
-//         recyclerView.setVisibility(isFullscreen ? View.GONE : View.VISIBLE);
-
-        closeButton.setVisibility(isPortrait ? View.VISIBLE : View.GONE);
-        //getSupportActionBar().show();
-        if (isFullscreen) {
-            //  getSupportActionBar().hide();
-            videoBox.setTranslationY(0); // Reset any translation that was applied in portrait.
-            setLayoutSize(videoFragment.getView(), MATCH_PARENT, MATCH_PARENT);
-            setLayoutSizeAndGravity(videoBox, MATCH_PARENT, MATCH_PARENT, Gravity.TOP | Gravity.LEFT);
-        } else if (isPortrait) {
-//            setLayoutSize(recyclerView, MATCH_PARENT, MATCH_PARENT);
-            setLayoutSize(videoFragment.getView(), MATCH_PARENT, WRAP_CONTENT);
-            setLayoutSizeAndGravity(videoBox, MATCH_PARENT, WRAP_CONTENT, Gravity.BOTTOM);
+        if (video_type == Constant.VIDEO_YOUTUBE) {
+            findViewById(R.id.video_view).setVisibility(View.GONE);
+            findViewById(R.id.video_fragment_container).setVisibility(View.VISIBLE);
+            if (isFullscreen) {
+                videoBox.setTranslationY(0);
+                setLayoutSize(videoFragment.getView(), MATCH_PARENT, MATCH_PARENT);
+                setLayoutSizeAndGravity(videoBox, MATCH_PARENT, MATCH_PARENT, Gravity.TOP | Gravity.LEFT);
+            } else if (isPortrait) {
+                setLayoutSize(videoFragment.getView(), MATCH_PARENT, WRAP_CONTENT);
+                setLayoutSizeAndGravity(videoBox, MATCH_PARENT, WRAP_CONTENT, Gravity.BOTTOM);
+            } else {
+                videoBox.setTranslationY(0);
+                int screenWidth = dpToPx(getResources().getConfiguration().screenWidthDp);
+                int videoWidth = screenWidth - screenWidth / 4 - dpToPx(LANDSCAPE_VIDEO_PADDING_DP);
+                setLayoutSize(videoFragment.getView(), videoWidth, WRAP_CONTENT);
+                setLayoutSizeAndGravity(videoBox, videoWidth, WRAP_CONTENT,
+                        Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+            }
         } else {
-            videoBox.setTranslationY(0); // Reset any translation that was applied in portrait.
-            int screenWidth = dpToPx(getResources().getConfiguration().screenWidthDp);
-//             setLayoutSize(recyclerView, screenWidth / 4, MATCH_PARENT);
-            int videoWidth = screenWidth - screenWidth / 4 - dpToPx(LANDSCAPE_VIDEO_PADDING_DP);
-            setLayoutSize(videoFragment.getView(), videoWidth, WRAP_CONTENT);
-            setLayoutSizeAndGravity(videoBox, videoWidth, WRAP_CONTENT,
-                    Gravity.RIGHT | Gravity.CENTER_VERTICAL);
+            findViewById(R.id.video_fragment_container).setVisibility(View.GONE);
+            findViewById(R.id.video_view).setVisibility(View.VISIBLE);
         }
     }
 
@@ -281,12 +346,38 @@ public class MainActivity extends AppCompatActivity implements YouTubePlayer.OnF
     public void onRefresh() {
         //ThienTT
         if (is_refesh) {
-            is_refesh = false;
+            //is_refesh = false;
             application.getFullLinkServer(handler);
         } else
             swipeRefreshLayout.setRefreshing(false);
     }
 
+    ///OPTION MENU
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.close:
+                onClickClose(null);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    MenuItem item_close;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        item_close = menu.findItem(R.id.close);
+        item_close.setVisible(false);
+        return true;
+    }
+
+    ///END OPTION MENU
     public static final class VideoFragment extends YouTubePlayerFragment
             implements YouTubePlayer.OnInitializedListener {
 
@@ -294,6 +385,7 @@ public class MainActivity extends AppCompatActivity implements YouTubePlayer.OnF
         private String videoId;
 
         public static VideoFragment newInstance() {
+
             return new VideoFragment();
         }
 
@@ -330,7 +422,7 @@ public class MainActivity extends AppCompatActivity implements YouTubePlayer.OnF
         @Override
         public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer player, boolean restored) {
             this.player = player;
-            player.addFullscreenControlFlag(YouTubePlayer.FULLSCREEN_FLAG_ALWAYS_FULLSCREEN_IN_LANDSCAPE);
+//            player.addFullscreenControlFlag(YouTubePlayer.FULLSCREEN_FLAG_ALWAYS_FULLSCREEN_IN_LANDSCAPE);
             player.setOnFullscreenListener((MainActivity) getActivity());
             if (!restored && videoId != null) {
                 player.cueVideo(videoId);
@@ -417,9 +509,9 @@ public class MainActivity extends AppCompatActivity implements YouTubePlayer.OnF
                 view.setOnItemClickListener(new ThienTTCardView.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position_item) {
-                       // TLog.d(null, "nhan vao: " + position + "-" + position_item);
+                        // TLog.d(null, "nhan vao: " + position + "-" + position_item);
                         //if (data.get(position).getMode() == ServerLink.TYPE_YOUTUBE) {
-                            openYoutubeLink(data.get(position).getMatches().get(position_item));
+                        openYoutubeLink(data.get(position).getMatches().get(position_item));
 //                        } else {
 //                            Toast.makeText(MainActivity.this, getString(R.string.update), Toast.LENGTH_SHORT).show();
 //                        }
@@ -428,6 +520,7 @@ public class MainActivity extends AppCompatActivity implements YouTubePlayer.OnF
             }
 
         }
+
     }
 
     public boolean doubleBackToExitPressedOnce;

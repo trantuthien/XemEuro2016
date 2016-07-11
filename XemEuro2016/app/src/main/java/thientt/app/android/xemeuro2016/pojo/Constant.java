@@ -25,6 +25,8 @@ public class Constant {
     public static final String RESULT_ERROR = AUTHORITY + "RESULT_ERROR";
     public static final String RESULT_ERROR_CONTENT = AUTHORITY + "RESULT_ERROR_CONTENT";
     public static final String CHOOSEYOUSIDE = "choose_your_side";
+    public static final int VIDEO_YOUTUBE = 0;
+    public static final int VIDEO_GOOGLE_DRIVER = 1;
 
     public static boolean isNetworkAvailable(Context context) {
         ConnectivityManager connectivityManager
